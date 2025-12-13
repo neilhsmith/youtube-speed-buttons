@@ -10,8 +10,8 @@
   padding: 10px 0;
   border: none;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #0f0f0f;
   font-size: 14px;
   font-weight: 500;
   font-family: "Roboto", "Arial", sans-serif;
@@ -20,14 +20,26 @@
 }
 
 .yt-speed-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode */
+html[dark] .yt-speed-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+html[dark] .yt-speed-btn:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.yt-speed-btn.active {
+.yt-speed-btn.active,
+html[dark] .yt-speed-btn.active {
   background-color: #ff0000;
   color: #fff;
 }
 
-.yt-speed-btn.active:hover {
+.yt-speed-btn.active:hover,
+html[dark] .yt-speed-btn.active:hover {
   background-color: #cc0000;
 }
