@@ -7,13 +7,15 @@
 
 .yt-speed-btn {
   flex: 1;
-  padding: 10px 0;
+  padding: 0 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 18px;
   background-color: rgba(0, 0, 0, 0.05);
   color: #0f0f0f;
+  font-family: "Roboto", "Arial", sans-serif;
   font-size: 14px;
   font-weight: 500;
+  line-height: 36px;
   font-family: "Roboto", "Arial", sans-serif;
   cursor: pointer;
   transition: background-color 0.2s ease;
