@@ -6,8 +6,8 @@
     // Don't create if already exists
     if (document.getElementById(CONTAINER_ID)) return;
 
-    const related = document.querySelector("#related");
-    if (!related) return;
+    const secondaryInner = document.querySelector("#columns #secondary #secondary-inner");
+    if (!secondaryInner) return;
 
     const video = document.querySelector("video");
     if (!video) return;
@@ -32,8 +32,8 @@
       container.appendChild(btn);
     });
 
-    // Insert as first child of #related
-    related.insertBefore(container, related.firstChild);
+    // Insert as first child of #secondary-inner
+    secondaryInner.insertBefore(container, secondaryInner.firstChild);
 
     // Listen for rate changes (from native controls or other sources)
     video.addEventListener("ratechange", updateActiveButton);
@@ -64,11 +64,11 @@
     // Try to create buttons immediately
     createSpeedButtons();
 
-    // If #related isn't ready yet, observe for it
+    // If #secondary-inner isn't ready yet, observe for it
     if (!document.getElementById(CONTAINER_ID)) {
       const observer = new MutationObserver(() => {
         if (
-          document.querySelector("#related") &&
+          document.querySelector("#columns #secondary #secondary-inner") &&
           document.querySelector("video")
         ) {
           createSpeedButtons();
