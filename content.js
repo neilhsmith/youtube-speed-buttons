@@ -1,16 +1,29 @@
 (function () {
   const SPEEDS = [0.5, 0.75, 1, 1.5, 2];
   const CONTAINER_ID = "yt-speed-buttons";
+  let observer = null;
+
+  function isSidebarReady() {
+    // Wait for sidebar to have actual content (related videos loaded)
+    const secondaryInner = document.querySelector("#columns #secondary #secondary-inner");
+    if (!secondaryInner) return false;
+
+    // Check if related videos or other content has loaded
+    const hasContent = secondaryInner.querySelector(
+      "ytd-watch-next-secondary-results-renderer, ytd-compact-video-renderer"
+    );
+    return !!hasContent;
+  }
 
   function createSpeedButtons() {
     // Don't create if already exists
-    if (document.getElementById(CONTAINER_ID)) return;
+    if (document.getElementById(CONTAINER_ID)) return false;
+
+    if (!isSidebarReady()) return false;
 
     const secondaryInner = document.querySelector("#columns #secondary #secondary-inner");
-    if (!secondaryInner) return;
-
     const video = document.querySelector("video");
-    if (!video) return;
+    if (!video) return false;
 
     const container = document.createElement("div");
     container.id = CONTAINER_ID;
@@ -37,6 +50,8 @@
 
     // Listen for rate changes (from native controls or other sources)
     video.addEventListener("ratechange", updateActiveButton);
+
+    return true;
   }
 
   function updateActiveButton() {
@@ -50,47 +65,41 @@
     });
   }
 
-  function removeSpeedButtons() {
-    const existing = document.getElementById(CONTAINER_ID);
-    if (existing) {
-      existing.remove();
-    }
-  }
+  function ensureButtons() {
+    // Only create if we're on a watch page
+    if (!location.pathname.startsWith("/watch")) return;
 
-  function init() {
-    // Clean up any existing buttons first
-    removeSpeedButtons();
-
-    // Try to create buttons immediately
-    createSpeedButtons();
-
-    // If #secondary-inner isn't ready yet, observe for it
+    // If buttons don't exist but the sidebar and video do, create them
     if (!document.getElementById(CONTAINER_ID)) {
-      const observer = new MutationObserver(() => {
-        if (
-          document.querySelector("#columns #secondary #secondary-inner") &&
-          document.querySelector("video")
-        ) {
-          createSpeedButtons();
-          if (document.getElementById(CONTAINER_ID)) {
-            observer.disconnect();
-          }
-        }
-      });
-
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-      });
-
-      // Timeout safety - stop observing after 30s
-      setTimeout(() => observer.disconnect(), 30000);
+      createSpeedButtons();
     }
   }
 
-  // Initial run
-  init();
+  function startObserver() {
+    // Don't create multiple observers
+    if (observer) return;
 
-  // Handle YouTube SPA navigation
-  document.addEventListener("yt-navigate-finish", init);
+    observer = new MutationObserver(() => {
+      ensureButtons();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  // Start observer immediately - this is our primary detection mechanism
+  // Don't rely on YouTube's custom events as they may not be ready on first load
+  startObserver();
+
+  // Also try immediately in case everything is already loaded
+  ensureButtons();
+
+  // YouTube SPA events - these help but aren't required
+  document.addEventListener("yt-navigate-finish", ensureButtons);
+  document.addEventListener("yt-page-data-updated", () => {
+    console.log("[YT Speed Buttons] yt-page-data-updated fired");
+    ensureButtons();
+  });
 })();
